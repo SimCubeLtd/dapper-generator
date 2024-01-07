@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>dappergen</AssemblyName>
+    <PackAsTool>true</PackAsTool>
+    <ToolName>dappergen</ToolName>
+    <Version>0.1.0-preview</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Title>Dapper Generator</Title>
+    <Authors>David Sekula / Prom3theu5 / SimCubeLtd</Authors>
+    <Description>POCO generation for Dapper.</Description>
+    <PackageProjectUrl>https://github.com/SimCubeLtd/dapper-generator</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/SimCubeLtd/dapper-generator.git</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>dapper;pocos;sqlserver</PackageTags>
+    <PackageReleaseNotes>Initial Release</PackageReleaseNotes>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="Humanizer" />
+    <PackageReference Include="Spectre.Cli" />
+    <PackageReference Include="System.Data.SqlClient" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

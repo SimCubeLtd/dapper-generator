@@ -1,0 +1,15 @@
+global using System.ComponentModel;
+global using System.ComponentModel.DataAnnotations;
+global using System.Data.SqlClient;
+global using System.Diagnostics;
+global using System.Text;
+global using System.Text.RegularExpressions;
+global using System.Xml.Linq;
+global using System.Xml.Serialization;
+global using Dapper;
+global using DapperGenerator.Commands.Generate;
+global using DapperGenerator.Generators;
+global using DapperGenerator.Models;
+global using Humanizer;
+global using Spectre.Cli;
+global using Spectre.Console;
