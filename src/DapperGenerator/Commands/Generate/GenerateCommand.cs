@@ -1,29 +1,38 @@
 namespace DapperGenerator.Commands.Generate;
 
-public class GenerateCommand : AsyncCommand<GenerateSettings>
+public sealed class GenerateCommand(IServiceProvider serviceProvider, IAnsiConsole console) : AsyncCommand<GenerateSettings>
 {
     public override async Task<int> ExecuteAsync(CommandContext context, GenerateSettings settings)
     {
-        AnsiConsole.MarkupLine("[blue]Generation started![/]");
+        console.MarkupLine("[blue]Generation started![/]");
 
         var sw = Stopwatch.StartNew();
 
-        AnsiConsole.MarkupLine("[blue]Reading schema...[/]");
+        await using var scope = serviceProvider.CreateAsyncScope();
 
-        var data = DbReader.ReadSchema(settings.ConnectionString);
+        // Only MsSql for now.
+        var dbReader = scope.ServiceProvider.GetRequiredKeyedService<IDatabaseProvider>(ProviderType.MsSqlServer.Name);
 
-        AnsiConsole.MarkupLine($"[blue]Extracted [green]{data.Count}[/] tables[/]");
+        var data = ExtractData(settings, dbReader);
+
+        if (data is null)
+        {
+            console.MarkupLine("[red]No data found[/]");
+            return 1;
+        }
+
+        console.MarkupLine($"[blue]Extracted [green]{data.Count}[/] tables[/]");
 
         var dataGroupedBySchema = data.GroupBy(x => x.Schema).ToList();
 
-        AnsiConsole.MarkupLine($"[blue]Found [green]{dataGroupedBySchema.Count}[/] schemas[/]");
+        console.MarkupLine($"[blue]Found [green]{dataGroupedBySchema.Count}[/] schemas[/]");
 
         var rootOutputDirectory = Path.Combine(AppContext.BaseDirectory, settings.OutputDirectory);
 
         if (Directory.Exists(rootOutputDirectory))
         {
             var prompt = $"[red]Directory '{rootOutputDirectory}' already exists, do you want to remove it first?[/]";
-            var clean = AnsiConsole.Confirm(prompt);
+            var clean = console.Confirm(prompt);
 
             if (clean)
             {
@@ -31,29 +40,54 @@ public class GenerateCommand : AsyncCommand<GenerateSettings>
             }
         }
 
-        var generator = new DapperPocoSourceGenerator();
-        var validatorGenerator = new DapperValidatorSourceGenerator();
+        var generator = scope.ServiceProvider.GetRequiredKeyedService<ISourceGenerator>(GeneratorType.Poco.Name);
 
         foreach (var schemaData in dataGroupedBySchema)
         {
             var tables = schemaData.ToList();
 
-            AnsiConsole.MarkupLine($"[blue]Generating schema [green]{schemaData.Key}[/] with [green]{tables.Count}[/] tables[/]");
+            console.MarkupLine($"[blue]Generating schema [green]{schemaData.Key}[/] with [green]{tables.Count}[/] tables[/]");
 
             await generator.Generate(settings, tables);
 
-            if (settings.GenerateModelValidator)
+            if (!settings.GenerateModelValidator)
             {
-                await validatorGenerator.Generate(settings, tables);
+                continue;
             }
+
+            var validatorGenerator = scope.ServiceProvider.GetRequiredKeyedService<ISourceGenerator>(GeneratorType.Validator.Name);
+            await validatorGenerator.Generate(settings, tables);
         }
 
         sw.Stop();
 
-        AnsiConsole.WriteLine();
-        AnsiConsole.MarkupLine($"[green]All Done - Model generation completed successfully with output directory: [purple]{settings.OutputDirectory}[/][/];");
-        AnsiConsole.MarkupLine($"Total Time Taken: [purple]{sw.Elapsed.ToString()}[/]");
+        console.WriteLine();
+        console.MarkupLine($"[green]All Done - Model generation completed successfully with output directory: [purple]{settings.OutputDirectory}[/][/];");
+        console.MarkupLine($"[blue]Total Time Taken:[/] [purple]{sw.Elapsed.ToString()}[/]");
 
         return 0;
+    }
+
+    private static IReadOnlyCollection<TableInfo>? ExtractData(GenerateSettings settings, IDatabaseProvider provider)
+    {
+        IReadOnlyCollection<TableInfo> data = null;
+
+        AnsiConsole.Progress()
+            .AutoClear(true)
+            .Columns(
+            [
+                new TaskDescriptionColumn(),
+                new ProgressBarColumn(),
+                new SpinnerColumn(),
+            ])
+            .Start(
+                context =>
+                {
+                    var gatherTask = context.AddTask("[blue]Reading schema[/]", autoStart: false).IsIndeterminate();
+                    data = provider.ReadSchema(settings.ConnectionString);
+                    gatherTask.Value(100).StopTask();
+                });
+
+        return data;
     }
 }

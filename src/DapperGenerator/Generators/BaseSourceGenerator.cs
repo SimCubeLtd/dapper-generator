@@ -1,6 +1,6 @@
 namespace DapperGenerator.Generators;
 
-public abstract class BaseSourceGenerator
+public abstract class BaseSourceGenerator : ISourceGenerator
 {
     protected readonly StringBuilder _sourceBuilder = new();
     private string _outputDirectory = null!;

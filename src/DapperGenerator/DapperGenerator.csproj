@@ -30,9 +30,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Ardalis.SmartEnum" />
     <PackageReference Include="Dapper" />
     <PackageReference Include="Humanizer" />
-    <PackageReference Include="Spectre.Cli" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Spectre.Console.Cli" />
     <PackageReference Include="System.Data.SqlClient" />
   </ItemGroup>
 
