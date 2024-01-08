@@ -62,7 +62,7 @@ Task("Pack")
     .WithCriteria(shouldPack)
     .Does(() =>
         {
-            DotNetPack("src/DapperGenerator/DapperGenerator.csproj",
+            DotNetPack("src/SimCube.DapperGenerator/SimCube.DapperGenerator.csproj",
              new DotNetPackSettings()
                         {
                             NoBuild = true,
