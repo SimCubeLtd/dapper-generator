@@ -4,6 +4,12 @@ It also supports generating [FluentValidation](https://fluentvalidation.net/) cl
 
 It is Very fast - a single query collects all data needed for generation
 
+## Installation
+```bash
+dotnet tool install -g SimCube.DapperGenerator
+```
+
+## Usage
 
 ```bash
   ____                                           ____

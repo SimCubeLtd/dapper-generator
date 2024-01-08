@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{8F261FF3-097
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{48A6A7BD-FAF4-437E-B5D1-3C201AC7C038}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DapperGenerator", "src\DapperGenerator\DapperGenerator.csproj", "{A02A0655-F5F2-4B47-8238-C036A2B1362E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimCube.DapperGenerator", "src\SimCube.DapperGenerator\SimCube.DapperGenerator.csproj", "{A02A0655-F5F2-4B47-8238-C036A2B1362E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
