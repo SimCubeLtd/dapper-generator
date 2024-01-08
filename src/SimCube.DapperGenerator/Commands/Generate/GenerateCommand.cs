@@ -78,12 +78,13 @@ public sealed class GenerateCommand(IServiceProvider serviceProvider, IAnsiConso
             [
                 new TaskDescriptionColumn(),
                 new ProgressBarColumn(),
+                new ElapsedTimeColumn(),
                 new SpinnerColumn(),
             ])
             .Start(
                 context =>
                 {
-                    var gatherTask = context.AddTask("[blue]Reading schema[/]", autoStart: false).IsIndeterminate();
+                    var gatherTask = context.AddTask("[blue]Reading schema[/]").IsIndeterminate();
                     data = provider.ReadSchema(settings.ConnectionString);
                     gatherTask.Value(100).StopTask();
                 });
