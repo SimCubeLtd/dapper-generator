@@ -24,6 +24,8 @@ public class DapperPocoSourceGenerator : BaseSourceGenerator
             _sourceBuilder.AppendLine("using System.Text.Json.Serialization;");
         }
 
+        _sourceBuilder.AppendLine($"using {config.Namespace.Pascalize()}.{properties.Schema.Pascalize()}.Entities;");
+
         _sourceBuilder.AppendLine();
         _sourceBuilder.AppendLine($"namespace {config.Namespace.Pascalize()}.{properties.Schema.Pascalize()}.Entities;");
         _sourceBuilder.AppendLine();
