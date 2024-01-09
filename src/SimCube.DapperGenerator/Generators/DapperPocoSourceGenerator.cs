@@ -17,19 +17,7 @@ public class DapperPocoSourceGenerator : BaseSourceGenerator
     {
         _sourceBuilder.Clear();
 
-        _sourceBuilder.AppendLine("using System;");
-
-        if (config.IncludeJsonProperties)
-        {
-            _sourceBuilder.AppendLine("using System.Text.Json.Serialization;");
-        }
-
-        foreach (var relationship in properties.Columns.SelectMany(column => column.Relationship))
-        {
-            _sourceBuilder.AppendLine($"using {config.Namespace.Pascalize()}.{relationship.Schema.Pascalize()}.Entities;");
-        }
-
-        _sourceBuilder.AppendLine($"using {config.Namespace.Pascalize()}.{properties.Schema.Pascalize()}.Entities;");
+        AddImports(properties, config);
 
         _sourceBuilder.AppendLine();
         _sourceBuilder.AppendLine($"namespace {config.Namespace.Pascalize()}.{properties.Schema.Pascalize()}.Entities;");
@@ -42,6 +30,43 @@ public class DapperPocoSourceGenerator : BaseSourceGenerator
         _sourceBuilder.AppendLine($"public class {className}");
         _sourceBuilder.AppendLine("{");
 
+        AddEachColumnAsProperty(properties, config);
+
+        RemoveLastLineBreak();
+
+        _sourceBuilder.AppendLine("}");
+        _sourceBuilder.AppendLine();
+
+        return _sourceBuilder.ToString();
+    }
+
+    private void AddImports(TableInfo properties, GenerateSettings config)
+    {
+        _sourceBuilder.AppendLine("using System;");
+
+        if (config.IncludeJsonProperties)
+        {
+            _sourceBuilder.AppendLine("using System.Text.Json.Serialization;");
+        }
+
+        AddRelatedNamespaceImports(properties, config);
+    }
+
+    private void AddRelatedNamespaceImports(TableInfo properties, GenerateSettings config)
+    {
+        foreach (var schema in properties.Columns.Where(x => x.Relationship is not null).SelectMany(column => column.Relationship).Select(x => x.Schema).ToHashSet())
+        {
+            if (schema.Equals(properties.Schema, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            _sourceBuilder.AppendLine($"using {config.Namespace.Pascalize()}.{schema.Pascalize()}.Entities;");
+        }
+    }
+
+    private void AddEachColumnAsProperty(TableInfo properties, GenerateSettings config)
+    {
         foreach (var column in properties.Columns)
         {
             if (config.IncludeJsonProperties)
@@ -68,13 +93,6 @@ public class DapperPocoSourceGenerator : BaseSourceGenerator
 
             AppendRelationships(properties, column, config);
         }
-
-        RemoveLastLineBreak();
-
-        _sourceBuilder.AppendLine("}");
-        _sourceBuilder.AppendLine();
-
-        return _sourceBuilder.ToString();
     }
 
     private void AppendRelationships(TableInfo properties, ColumnInfo column, GenerateSettings config)

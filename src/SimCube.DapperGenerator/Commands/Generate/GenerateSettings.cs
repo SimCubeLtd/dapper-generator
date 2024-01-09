@@ -32,4 +32,8 @@ public sealed class GenerateSettings : CommandSettings
     [CommandOption("--include-json")]
     [Description("Include json property names when generating pocos.")]
     public bool IncludeJsonProperties { get; set; }
+
+    [CommandOption("--non-interactive")]
+    [Description("Disable interactive mode. This will overwrite files without prompting.")]
+    public bool NonInteractive { get; set; }
 }

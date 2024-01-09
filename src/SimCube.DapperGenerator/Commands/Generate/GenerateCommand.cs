@@ -29,16 +29,7 @@ public sealed class GenerateCommand(IServiceProvider serviceProvider, IAnsiConso
 
         var rootOutputDirectory = Path.Combine(Directory.GetCurrentDirectory(), settings.OutputDirectory);
 
-        if (Directory.Exists(rootOutputDirectory))
-        {
-            var prompt = $"[red]Directory '{rootOutputDirectory}' already exists, do you want to remove it first?[/]";
-            var clean = console.Confirm(prompt);
-
-            if (clean)
-            {
-                Directory.Delete(rootOutputDirectory, true);
-            }
-        }
+        HandleExistingDirectory(rootOutputDirectory, settings);
 
         var generator = scope.ServiceProvider.GetRequiredKeyedService<ISourceGenerator>(GeneratorType.Poco.Name);
 
@@ -66,6 +57,26 @@ public sealed class GenerateCommand(IServiceProvider serviceProvider, IAnsiConso
         console.MarkupLine($"[blue]Total Time Taken:[/] [purple]{sw.Elapsed.ToString()}[/]");
 
         return 0;
+    }
+
+    private void HandleExistingDirectory(string rootOutputDirectory, GenerateSettings input)
+    {
+        if (input.NonInteractive)
+        {
+            Directory.Delete(rootOutputDirectory, true);
+            return;
+        }
+
+        if (Directory.Exists(rootOutputDirectory))
+        {
+            var prompt = $"[red]Directory '{rootOutputDirectory}' already exists, do you want to remove it first?[/]";
+            var clean = console.Confirm(prompt);
+
+            if (clean)
+            {
+                Directory.Delete(rootOutputDirectory, true);
+            }
+        }
     }
 
     private static IReadOnlyCollection<TableInfo>? ExtractData(GenerateSettings settings, IDatabaseProvider provider)
