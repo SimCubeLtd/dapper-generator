@@ -18,7 +18,7 @@ public abstract class BaseSourceGenerator : ISourceGenerator
             throw new ArgumentException("Cannot be both a validator and an entity");
         }
 
-        _outputDirectory = config.OutputDirectory;
+        _outputDirectory = Path.Combine(Directory.GetCurrentDirectory(), config.OutputDirectory);
 
         if (tableInfo is not null)
         {

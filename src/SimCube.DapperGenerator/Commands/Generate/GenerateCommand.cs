@@ -27,7 +27,7 @@ public sealed class GenerateCommand(IServiceProvider serviceProvider, IAnsiConso
 
         console.MarkupLine($"[blue]Found [green]{dataGroupedBySchema.Count}[/] schemas[/]");
 
-        var rootOutputDirectory = Path.Combine(AppContext.BaseDirectory, settings.OutputDirectory);
+        var rootOutputDirectory = Path.Combine(Directory.GetCurrentDirectory(), settings.OutputDirectory);
 
         if (Directory.Exists(rootOutputDirectory))
         {
