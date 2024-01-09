@@ -42,8 +42,17 @@ public class DapperPocoSourceGenerator : BaseSourceGenerator
                 _sourceBuilder.AppendLine($"\t[JsonPropertyName(\"{JsonName(column.CleanName)}\")]");
             }
 
-            _sourceBuilder.AppendLine($"\tpublic {column.Type} {column.CleanName} {{ get; set; }}");
-            _sourceBuilder.AppendLine();
+            switch (column.IsNullable)
+            {
+                case true:
+                    _sourceBuilder.AppendLine($"\tpublic {column.Type}? {column.CleanName} {{ get; set; }}");
+                    _sourceBuilder.AppendLine();
+                    break;
+                case false:
+                    _sourceBuilder.AppendLine($"\tpublic {column.Type} {column.CleanName} {{ get; set; }} = default!;");
+                    _sourceBuilder.AppendLine();
+                    break;
+            }
 
             if (column.Relationship is not {Count: > 0})
             {
@@ -77,7 +86,7 @@ public class DapperPocoSourceGenerator : BaseSourceGenerator
                 _sourceBuilder.AppendLine($"\t[JsonPropertyName(\"{JsonName($"Ref{column.Name}")}\")]");
             }
 
-            _sourceBuilder.AppendLine($"\tpublic {relationshipRoot.CleanName} Ref{column.Name} {{ get; set; }}");
+            _sourceBuilder.AppendLine($"\tpublic {relationshipRoot.CleanName}? Ref{column.Name} {{ get; set; }}");
             _sourceBuilder.AppendLine();
         }
     }
