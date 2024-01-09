@@ -27,7 +27,7 @@ public class DapperPocoSourceGenerator : BaseSourceGenerator
         _sourceBuilder.AppendLine($"/// Table Name: <b>{properties.Name}</b>");
         _sourceBuilder.AppendLine("/// </summary>");
 
-        _sourceBuilder.AppendLine($"public class {className}");
+        _sourceBuilder.AppendLine($"public class {className}Entity");
         _sourceBuilder.AppendLine("{");
 
         AddEachColumnAsProperty(properties, config);
@@ -111,7 +111,7 @@ public class DapperPocoSourceGenerator : BaseSourceGenerator
                 _sourceBuilder.AppendLine($"\t[JsonPropertyName(\"{JsonName($"Ref{column.Name}")}\")]");
             }
 
-            _sourceBuilder.AppendLine($"\tpublic {relationshipRoot.CleanName}? Ref{column.Name} {{ get; set; }}");
+            _sourceBuilder.AppendLine($"\tpublic {relationshipRoot.CleanName}Entity? Ref{column.Name} {{ get; set; }}");
             _sourceBuilder.AppendLine();
         }
     }
