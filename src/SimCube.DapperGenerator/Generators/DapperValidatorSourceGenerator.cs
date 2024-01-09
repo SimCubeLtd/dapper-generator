@@ -22,19 +22,25 @@ public class DapperValidatorSourceGenerator : BaseSourceGenerator
         _sourceBuilder.AppendLine();
         _sourceBuilder.AppendLine($"namespace {config.Namespace.Pascalize()}.{properties.Schema.Pascalize()}.Validators;");
         _sourceBuilder.AppendLine();
-        _sourceBuilder.AppendLine($"public class {className} : AbstractValidator<{GetPrefixedSuffixed(config, properties.CleanName)}>");
+        _sourceBuilder.AppendLine($"public class {className} : AbstractValidator<{GetPrefixedSuffixed(config, properties.CleanName)}Entity>");
         _sourceBuilder.AppendLine("{");
         _sourceBuilder.AppendLine($"\tpublic {className}()");
         _sourceBuilder.AppendLine("\t{");
         foreach (var column in properties.Columns)
         {
-            if (!column.IsNullable)
+            if (!column.IsNullable && column.Type.Equals("string", StringComparison.OrdinalIgnoreCase))
             {
-                _sourceBuilder.AppendLine($"\t\tRuleFor(entity => entity.{column.CleanName}).NotEmpty();");
+                _sourceBuilder.AppendLine($"\t\tRuleFor(entity => entity.{column.CleanName}).NotNull().NotEmpty();");
                 _sourceBuilder.AppendLine();
             }
 
-            if (column.MaximumLength > 0 && column.Type != "byte[]")
+            if (!column.IsNullable && !column.Type.Equals("string", StringComparison.OrdinalIgnoreCase))
+            {
+                _sourceBuilder.AppendLine($"\t\tRuleFor(entity => entity.{column.CleanName}).NotNull();");
+                _sourceBuilder.AppendLine();
+            }
+
+            if (column.MaximumLength > 0 && column.Type.Equals("byte[]", StringComparison.OrdinalIgnoreCase))
             {
                 _sourceBuilder.AppendLine($"\t\tRuleFor(entity => entity.{column.CleanName}).MaximumLength({column.MaximumLength});");
                 _sourceBuilder.AppendLine();
