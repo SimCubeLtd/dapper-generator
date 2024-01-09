@@ -24,6 +24,11 @@ public class DapperPocoSourceGenerator : BaseSourceGenerator
             _sourceBuilder.AppendLine("using System.Text.Json.Serialization;");
         }
 
+        foreach (var relationship in properties.Columns.SelectMany(column => column.Relationship))
+        {
+            _sourceBuilder.AppendLine($"using {config.Namespace.Pascalize()}.{relationship.Schema.Pascalize()}.Entities;");
+        }
+
         _sourceBuilder.AppendLine($"using {config.Namespace.Pascalize()}.{properties.Schema.Pascalize()}.Entities;");
 
         _sourceBuilder.AppendLine();
